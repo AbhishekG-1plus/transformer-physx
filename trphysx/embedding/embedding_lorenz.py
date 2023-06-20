@@ -58,7 +58,7 @@ class LorenzEmbedding(EmbeddingModel):
         # Off-diagonal indices
         xidx = []
         yidx = []
-        for i in range(1, 3):
+        for i in range(1, 15): 
             yidx.append(np.arange(i, config.n_embd))
             xidx.append(np.arange(0, config.n_embd-i))
 
@@ -67,8 +67,8 @@ class LorenzEmbedding(EmbeddingModel):
         self.kMatrixUT = nn.Parameter(0.1*torch.rand(self.xidx.size(0)))
 
         # Normalization occurs inside the model
-        self.register_buffer('mu', torch.tensor([0., 0., 0.]))
-        self.register_buffer('std', torch.tensor([1., 1., 1.]))
+        self.register_buffer('mu', torch.tensor([0., 0., 0., 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.]))
+        self.register_buffer('std', torch.tensor([1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]))
         logger.info('Number of embedding parameters: {}'.format( super().num_parameters ))
 
     def forward(self, x: Tensor) -> TensorTuple:

@@ -24,7 +24,7 @@ class LorenzConfig(PhysConfig):
         n_embd=32,
         n_layer=4,
         n_head=4,
-        state_dims=[3],
+        state_dims=[15],
         activation_function="gelu_new",
         initializer_range=0.05,
         **kwargs
