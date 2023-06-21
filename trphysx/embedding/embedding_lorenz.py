@@ -75,13 +75,13 @@ class LorenzEmbedding(EmbeddingModel):
         """Forward pass
 
         Args:
-            x (Tensor): [B, 3] Input feature tensor
+            x (Tensor): [B, 15] Input feature tensor
 
         Returns:
             TensorTuple: Tuple containing:
 
                 | (Tensor): [B, config.n_embd] Koopman observables
-                | (Tensor): [B, 3] Recovered feature tensor
+                | (Tensor): [B, 15] Recovered feature tensor
         """
         # Encode
         x = self._normalize(x)
@@ -95,7 +95,7 @@ class LorenzEmbedding(EmbeddingModel):
         """Embeds tensor of state variables to Koopman observables
 
         Args:
-            x (Tensor): [B, 3] Input feature tensor
+            x (Tensor): [B, 15] Input feature tensor
 
         Returns:
             Tensor: [B, config.n_embd] Koopman observables
@@ -111,7 +111,7 @@ class LorenzEmbedding(EmbeddingModel):
             g (Tensor): [B, config.n_embd] Koopman observables
 
         Returns:
-            Tensor: [B, 3] Physical feature tensor
+            Tensor: [B, 15] Physical feature tensor
         """
         out = self.recoveryNet(g)
         x = self._unnormalize(out)
@@ -182,7 +182,7 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         """Trains model for a single epoch
 
         Args:
-            states (Tensor): [B, T, 3] Time-series feature tensor
+            states (Tensor): [B, T, 15] Time-series feature tensor
 
         Returns:
             FloatTuple: Tuple containing:
@@ -225,7 +225,7 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         predictions.
 
         Args:
-            states (Tensor): [B, T, 3] Time-series feature tensor
+            states (Tensor): [B, T, 15] Time-series feature tensor
 
         Returns:
             Tuple[Float, Tensor, Tensor]: Test error, Predicted states, Target states
