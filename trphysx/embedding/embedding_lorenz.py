@@ -250,3 +250,7 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         test_loss = mseLoss(yTarget, yPred)
 
         return test_loss, yPred, yTarget
+    
+    def testPrint(){
+        print("Hello World")
+    }
