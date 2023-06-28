@@ -253,4 +253,4 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
     
     def testPrint(self):
         print("Hello World")
-        return 0;
+        return 0
