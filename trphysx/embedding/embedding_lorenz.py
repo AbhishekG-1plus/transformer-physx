@@ -157,6 +157,9 @@ class LorenzEmbedding(EmbeddingModel):
             return self.kMatrix
 
     def _normalize(self, x):
+        print(self.x.shape)
+        print(self.mu.shape)
+        print(self.std.shape)
         return (x - self.mu.unsqueeze(0))/self.std.unsqueeze(0)
 
     def _unnormalize(self, x):
