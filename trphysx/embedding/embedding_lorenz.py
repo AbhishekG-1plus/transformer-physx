@@ -251,6 +251,6 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
 
         return test_loss, yPred, yTarget
     
-    def testPrint(){
+    def testPrint(self):
         print("Hello World")
-    }
+        return 0;
