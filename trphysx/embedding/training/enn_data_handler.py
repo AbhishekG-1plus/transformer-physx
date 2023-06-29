@@ -126,8 +126,19 @@ class LorenzDataHandler(EmbeddingDataHandler):
 
         # Calculate normalization constants
         data = torch.cat(examples, dim=0)
-        self.mu = torch.mean(data, dim=(0,1))
-        self.std = torch.std(data, dim=(0,1))
+        # self.mu = torch.mean(data, dim=(0,1))
+        # self.std = torch.std(data, dim=(0,1))
+        self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2]), 
+                                torch.mean(data[:,:,3]), torch.mean(data[:,:,4]), torch.mean(data[:,:,5]),
+                                torch.mean(data[:,:,6]), torch.mean(data[:,:,7]), torch.mean(data[:,:,8]),
+                                torch.mean(data[:,:,9]), torch.mean(data[:,:,10]), torch.mean(data[:,:,11]),
+                                torch.mean(data[:,:,12]),torch.mean(data[:,:,13]), torch.mean(data[:,:,14])])
+        
+        self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2]), 
+                                 torch.std(data[:,:,3]), torch.std(data[:,:,4]), torch.std(data[:,:,5]),
+                                 torch.std(data[:,:,6]), torch.std(data[:,:,7]), torch.std(data[:,:,8]),
+                                 torch.std(data[:,:,9]), torch.std(data[:,:,10]), torch.std(data[:,:,11]),
+                                 torch.std(data[:,:,12]),torch.std(data[:,:,13]), torch.std(data[:,:,14])])
         # self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2])])
         # self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2])])
 
