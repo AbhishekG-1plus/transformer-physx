@@ -126,8 +126,10 @@ class LorenzDataHandler(EmbeddingDataHandler):
 
         # Calculate normalization constants
         data = torch.cat(examples, dim=0)
-        self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2])])
-        self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2])])
+        self.mu = torch.mean(data, dim=(0,1))
+        self.std = torch.std(data, dim=(0,1))
+        # self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2])])
+        # self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2])])
 
         # Needs to min-max normalization due to the reservoir matrix, needing to have a spectral density below 1
         if(data.size(0) < batch_size):
