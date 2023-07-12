@@ -296,7 +296,7 @@ class Trainer:
         state_error = 0
         timestep_error = None
         state_preds = []  # List to store state_pred values
-        state_target = []
+        state_targets = []
 
         for mbidx, inputs in enumerate(eval_dataloader):
 
@@ -313,7 +313,7 @@ class Trainer:
 
             loss, state_pred, state_target = self.model.evaluate(**inputs)
             state_preds.append(state_pred)
-            state_target.append(state_target)
+            state_targets.append(state_target)
             
             plot_id = mbidx*self.args.eval_batch_size # Plotting id used to index figures
             state_error0 = self.eval_states(pred_embeds, states, epoch, plot_id=plot_id)
@@ -323,7 +323,7 @@ class Trainer:
         self.log_metrics.push(eval_epoch=epoch, eval_error=float(eval_error), state_error=float(state_error))
         self.log_metrics.time_error = timestep_error.cpu().numpy()
 
-        return {'eval_error': eval_error, 'state_preds': state_preds,'state_target':state_target}
+        return {'eval_error': eval_error, 'state_preds': state_preds,'state_targets':state_target}
 
     @torch.no_grad()
     def eval_step(
