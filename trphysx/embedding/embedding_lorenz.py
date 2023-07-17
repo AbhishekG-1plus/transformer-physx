@@ -35,8 +35,8 @@ class LorenzEmbedding(EmbeddingModel):
         """
         super().__init__(config)
 
-        hidden_states = int(abs(config.state_dims[0] - config.n_embd)/2) + 1
-        # hidden_states = 500
+        # hidden_states = int(abs(config.state_dims[0] - config.n_embd)/2) + 1
+        hidden_states = 500
 
         self.observableNet = nn.Sequential(
             nn.Linear(config.state_dims[0], hidden_states),
