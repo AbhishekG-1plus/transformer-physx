@@ -311,9 +311,14 @@ class Trainer:
             eval_error += pred_error0/len(eval_dataloader)
             timestep_error += timestep_error0/len(eval_dataloader)
 
-            loss, state_pred, state_target = self.model.evaluate(**inputs)
-            state_preds.append(pred_embeds)
-            state_targets.append(states)
+            bsize = pred_embeds.size(0)
+            tsize = pred_embeds.size(1)
+            device = self.embedding_model.devices[0]
+        
+            states = states.to(device)
+            x_in = pred_embeds.contiguous().view(-1, pred_embeds.size(-1)).to(device)
+            out = self.embedding_model.recover(x_in)
+            out = out.view([bsize, tsize] + self.embedding_model.input_dims)
             
             plot_id = mbidx*self.args.eval_batch_size # Plotting id used to index figures
             state_error0 = self.eval_states(pred_embeds, states, epoch, plot_id=plot_id)
@@ -323,7 +328,7 @@ class Trainer:
         self.log_metrics.push(eval_epoch=epoch, eval_error=float(eval_error), state_error=float(state_error))
         self.log_metrics.time_error = timestep_error.cpu().numpy()
 
-        return {'eval_error': eval_error, 'prediction': pred_embeds,'actual':states}
+        return {'eval_error': eval_error, 'prediction': out,'actual':states}
 
     @torch.no_grad()
     def eval_step(
