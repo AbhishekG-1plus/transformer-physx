@@ -323,7 +323,7 @@ class Trainer:
         self.log_metrics.push(eval_epoch=epoch, eval_error=float(eval_error), state_error=float(state_error))
         self.log_metrics.time_error = timestep_error.cpu().numpy()
 
-        return {'eval_error': eval_error, 'state_preds': state_preds,'state_targets':state_target}
+        return {'eval_error': eval_error, 'prediction': pred_embeds,'actual':states}
 
     @torch.no_grad()
     def eval_step(
