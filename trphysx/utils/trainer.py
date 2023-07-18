@@ -312,8 +312,8 @@ class Trainer:
             timestep_error += timestep_error0/len(eval_dataloader)
 
             loss, state_pred, state_target = self.model.evaluate(**inputs)
-            state_preds.append(state_pred)
-            state_targets.append(state_target)
+            state_preds.append(pred_embeds)
+            state_targets.append(states)
             
             plot_id = mbidx*self.args.eval_batch_size # Plotting id used to index figures
             state_error0 = self.eval_states(pred_embeds, states, epoch, plot_id=plot_id)
