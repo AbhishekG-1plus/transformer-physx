@@ -272,13 +272,13 @@ class CylinderDataHandler(EmbeddingDataHandler):
         assert os.path.isfile(file_path), "Training HDF5 file {} not found".format(file_path)
 
         examples = []
-        visc = []
+        # visc = []
         with h5py.File(file_path, "r") as f:
             # Iterate through stored time-series
             samples = 0
 
             for key in f.keys():
-                visc0 = (2.0/float(key))
+                # visc0 = (2.0/float(key))
                 ux = torch.Tensor(f[key+'/ux'])
                 uy = torch.Tensor(f[key + '/uy'])
                 p = torch.Tensor(f[key + '/p'])
@@ -287,7 +287,7 @@ class CylinderDataHandler(EmbeddingDataHandler):
                 # Stride over time-series
                 for i in range(0, data_series.size(0) - block_size + 1, stride):  # Truncate in block of block_size
                     examples.append(data_series[i: i + block_size])
-                    visc.append(torch.tensor([visc0]))
+                    # visc.append(torch.tensor([visc0]))
 
                 samples = samples + 1
                 if (ndata > 0 and samples > ndata):  # If we have enough time-series samples break loop
@@ -312,7 +312,8 @@ class CylinderDataHandler(EmbeddingDataHandler):
             logging.warn('Lower batch-size to {:d}'.format(data.size(0)))
             batch_size = data.size(0)
 
-        dataset = self.CylinderDataset(data, torch.stack(visc, dim=0))
+        # dataset = self.CylinderDataset(data, torch.stack(vis, dim=0))
+        dataset = self.CylinderDataset(data, torch.tensor([0]))
         data_collator = self.CylinderDataCollator()
         training_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=data_collator, drop_last=True)
         return training_loader
@@ -343,12 +344,12 @@ class CylinderDataHandler(EmbeddingDataHandler):
         assert os.path.isfile(file_path), "Eval HDF5 file {} not found".format(file_path)
 
         examples = []
-        visc = []
+        # visc = []
         with h5py.File(file_path, "r") as f:
             # Iterate through stored time-series
             samples = 0
             for key in f.keys():
-                visc0 = (2.0/float(key))
+                # visc0 = (2.0/float(key))
                 ux = torch.Tensor(f[key + '/ux'])
                 uy = torch.Tensor(f[key + '/uy'])
                 p = torch.Tensor(f[key + '/p'])
@@ -356,7 +357,7 @@ class CylinderDataHandler(EmbeddingDataHandler):
                 # Stride over time-series data_series.size(0)
                 for i in range(0, data_series.size(0) - block_size + 1, block_size):  # Truncate in block of block_size
                     examples.append(data_series[i: i + block_size])
-                    visc.append(torch.tensor([visc0]))
+                    # visc.append(torch.tensor([visc0]))
                     break
 
                 samples = samples + 1
@@ -369,7 +370,8 @@ class CylinderDataHandler(EmbeddingDataHandler):
             logging.warning('Lower batch-size to {:d}'.format(data.size(0)))
             batch_size = data.size(0)
 
-        dataset = self.CylinderDataset(data, torch.stack(visc, dim=0))
+        # dataset = self.CylinderDataset(data, torch.stack(visc, dim=0))
+        dataset = self.CylinderDataset(data, torch.tensor([0]))
         data_collator = self.CylinderDataCollator()
         testing_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=data_collator, drop_last=False)
 
