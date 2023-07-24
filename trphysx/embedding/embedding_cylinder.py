@@ -185,12 +185,16 @@ class CylinderEmbedding(EmbeddingModel):
         # Koopman operator
         kMatrix = Variable(torch.zeros(g.size(0), self.obsdim, self.obsdim)).to(self.devices[0])
         # Populate the off diagonal terms
-        kMatrix[:,self.xidx, self.yidx] = self.kMatrixUT(100*visc)
-        kMatrix[:,self.yidx, self.xidx] = self.kMatrixLT(100*visc)
+        kMatrix[:,self.xidx, self.yidx] = self.kMatrixUT
+        kMatrix[:,self.yidx, self.xidx] = self.kMatrixLT
+        # kMatrix[:,self.xidx, self.yidx] = self.kMatrixUT(100*visc)
+        # kMatrix[:,self.yidx, self.xidx] = self.kMatrixLT(100*visc)
 
         # Populate the diagonal
         ind = np.diag_indices(kMatrix.shape[1])
-        self.kMatrixDiag = self.kMatrixDiagNet(100*visc)
+        # self.kMatrixDiag = self.kMatrixDiagNet(100*visc)
+        self.kMatrixDiag = self.kMatrixDiagNet
+
         kMatrix[:, ind[0], ind[1]] = self.kMatrixDiag
 
         # Apply Koopman operation
@@ -310,7 +314,8 @@ class CylinderEmbeddingTrainer(EmbeddingTrainingHead):
         # Test accuracy of one time-step
         for i in range(xInput.size(1)):
             xInput0 = xInput[:,i].to(device)
-            g0 = self.embedding_model.embed(xInput0, viscosity)
+            # g0 = self.embedding_model.embed(xInput0, viscosity)
+            g0 = self.embedding_model.embed(xInput0)
             yPred0 = self.embedding_model.recover(g0)
             yPred[:,i] = yPred0.squeeze().detach()
 
