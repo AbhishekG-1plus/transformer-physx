@@ -221,13 +221,14 @@ class CylinderDataHandler(EmbeddingDataHandler):
             """Constructor
             """
             self.examples = examples
-            self.visc = visc
+            # self.visc = visc
 
         def __len__(self):
             return len(self.examples)
 
         def __getitem__(self, i) -> Dict[str, torch.Tensor]:
-            return {"states": self.examples[i], "viscosity": self.visc[i]}
+            return {"states": self.examples[i]}
+                            # , "viscosity": visc_tensor}
 
     @dataclass
     class CylinderDataCollator:
@@ -237,9 +238,11 @@ class CylinderDataHandler(EmbeddingDataHandler):
         def __call__(self, examples:List[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
             # Stack examples in mini-batch
             x_data_tensor =  torch.stack([example["states"] for example in examples])
-            visc_tensor =  torch.stack([example["viscosity"] for example in examples])
+            # visc_tensor =  torch.stack([example["viscosity"] for example in examples])
 
-            return {"states": x_data_tensor, "viscosity": visc_tensor}
+            return {"states": x_data_tensor}
+                    # , "viscosity": visc_tensor}
+
 
     def createTrainingLoader(self, 
         file_path: str,
