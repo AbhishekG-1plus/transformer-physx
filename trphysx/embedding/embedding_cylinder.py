@@ -94,7 +94,7 @@ class CylinderEmbedding(EmbeddingModel):
         # Off-diagonal indices
         xidx = []
         yidx = []
-        for i in range(1, 5):
+        for i in range(1, 15):
             yidx.append(np.arange(i, self.obsdim))
             xidx.append(np.arange(0, self.obsdim-i))
         self.xidx = torch.LongTensor(np.concatenate(xidx))
@@ -137,7 +137,7 @@ class CylinderEmbedding(EmbeddingModel):
 
         return g, xhat
 
-    def embed(self, x: Tensor, visc: Tensor) -> Tensor:
+    def embed(self, x: Tensor) -> Tensor:
         """Embeds tensor of state variables to Koopman observables
 
         Args:
@@ -148,7 +148,7 @@ class CylinderEmbedding(EmbeddingModel):
             (Tensor): [B, config.n_embd] Koopman observables
         """
         # Concat viscosities as a feature map
-        x = torch.cat([x, visc.unsqueeze(-1).unsqueeze(-1) * torch.ones_like(x[:,:1])], dim=1)
+        # x = torch.cat([x, visc.unsqueeze(-1).unsqueeze(-1) * torch.ones_like(x[:,:1])], dim=1)
         x = self._normalize(x)
 
         g = self.observableNet(x)
@@ -171,7 +171,8 @@ class CylinderEmbedding(EmbeddingModel):
         x[mask0] = 0
         return x
 
-    def koopmanOperation(self, g: Tensor, visc: Tensor) -> Tensor:
+    # def koopmanOperation(self, g: Tensor, visc: Tensor) -> Tensor:
+    def koopmanOperation(self, g: Tensor) -> Tensor:
         """Applies the learned Koopman operator on the given observables
 
         Args:
@@ -235,6 +236,7 @@ class CylinderEmbeddingTrainer(EmbeddingTrainingHead):
         super().__init__()
         self.embedding_model = CylinderEmbedding(config)
 
+    # def forward(self, states: Tensor, viscosity: Tensor) -> FloatTuple:
     def forward(self, states: Tensor, viscosity: Tensor) -> FloatTuple:
         """Trains model for a single epoch
 
@@ -248,7 +250,7 @@ class CylinderEmbeddingTrainer(EmbeddingTrainingHead):
                 | (float): Koopman based loss of current epoch
                 | (float): Reconstruction loss
         """
-        assert states.size(0) == viscosity.size(0), 'State variable and viscosity tensor should have the same batch dimensions.'
+        # assert states.size(0) == viscosity.size(0), 'State variable and viscosity tensor should have the same batch dimensions.'
 
         self.embedding_model.train()
         device = self.embedding_model.devices[0]
@@ -257,7 +259,7 @@ class CylinderEmbeddingTrainer(EmbeddingTrainingHead):
         mseLoss = nn.MSELoss()
 
         xin0 = states[:,0].to(device) # Time-step
-        viscosity = viscosity.to(device)
+        # viscosity = viscosity.to(device)
 
         # Model forward for initial time-step
         g0, xRec0 = self.embedding_model(xin0, viscosity)
@@ -282,7 +284,8 @@ class CylinderEmbeddingTrainer(EmbeddingTrainingHead):
 
         return loss, loss_reconstruct
 
-    def evaluate(self, states: Tensor, viscosity: Tensor) -> Tuple[float, Tensor, Tensor]:
+    # def evaluate(self, states: Tensor, viscosity: Tensor) -> Tuple[float, Tensor, Tensor]:
+    def evaluate(self, states: Tensor) -> Tuple[float, Tensor, Tensor]:
         """Evaluates the embedding models reconstruction error and returns its
         predictions.
 
@@ -302,7 +305,7 @@ class CylinderEmbeddingTrainer(EmbeddingTrainingHead):
         yTarget = states[:,1:].to(device)
         xInput = states[:,:-1].to(device)
         yPred = torch.zeros(yTarget.size()).to(device)
-        viscosity = viscosity.to(device)
+        # viscosity = viscosity.to(device)
 
         # Test accuracy of one time-step
         for i in range(xInput.size(1)):
