@@ -108,7 +108,8 @@ class CylinderEmbedding(EmbeddingModel):
         self.register_buffer('std', torch.tensor([1., 1., 1., 1.]))
         logger.info('Number of embedding parameters: {}'.format( super().num_parameters ))
 
-    def forward(self, x: Tensor, visc: Tensor) -> TensorTuple:
+    # def forward(self, x: Tensor, visc: Tensor) -> TensorTuple:
+     def forward(self, x: Tensor) -> TensorTuple:
         """Forward pass
 
         Args:
@@ -122,7 +123,8 @@ class CylinderEmbedding(EmbeddingModel):
                 | (Tensor): [B, 3, H, W] Recovered feature tensor
         """
         # Concat viscosities as a feature map
-        x = torch.cat([x, visc.unsqueeze(-1).unsqueeze(-1) * torch.ones_like(x[:,:1])], dim=1)
+        # x = torch.cat([x, visc.unsqueeze(-1).unsqueeze(-1) * torch.ones_like(x[:,:1])], dim=1)
+        # x = torch.cat([x] ,dim=1)
         x = self._normalize(x)
         g0 = self.observableNet(x)
         g = self.observableNetFC(g0.view(g0.size(0),-1))
