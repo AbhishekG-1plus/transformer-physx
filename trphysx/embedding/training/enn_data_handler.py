@@ -228,7 +228,7 @@ class CylinderDataHandler(EmbeddingDataHandler):
             return len(self.examples)
 
         # def __getitem__(self, i) -> Dict[str, torch.Tensor]:
-        def __getitem__(self, i) -> Dict[str]:
+        def __getitem__(self, i) -> Dict[str,torch.Tensor]:
             return {"states": self.examples[i]}
                             # , "viscosity": visc_tensor}
 
@@ -237,8 +237,8 @@ class CylinderDataHandler(EmbeddingDataHandler):
         """Data collator for flow around a cylinder embedding problem
         """
         # Default collator
-        # def __call__(self, examples:List[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
-        def __call__(self, examples:List[Dict[str]]) -> Dict[str]:
+        def __call__(self, examples:List[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
+        # def __call__(self, examples:List[Dict[str]]) -> Dict[str]:
             # Stack examples in mini-batch
             x_data_tensor =  torch.stack([example["states"] for example in examples])
             # visc_tensor =  torch.stack([example["viscosity"] for example in examples])
