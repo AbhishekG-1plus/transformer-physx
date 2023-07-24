@@ -279,10 +279,11 @@ class CylinderDataHandler(EmbeddingDataHandler):
 
             for key in f.keys():
                 # visc0 = (2.0/float(key))
-                ux = torch.Tensor(f[key+'/ux'])
-                uy = torch.Tensor(f[key + '/uy'])
-                p = torch.Tensor(f[key + '/p'])
-                data_series = torch.stack([ux, uy, p], dim=1)
+                # ux = torch.Tensor(f[key+'/ux'])
+                # uy = torch.Tensor(f[key + '/uy'])
+                # p = torch.Tensor(f[key + '/p'])
+                # data_series = torch.stack([ux, uy, p], dim=1)
+                data_series = torch.Tensor(f[key])
 
                 # Stride over time-series
                 for i in range(0, data_series.size(0) - block_size + 1, stride):  # Truncate in block of block_size
@@ -350,10 +351,11 @@ class CylinderDataHandler(EmbeddingDataHandler):
             samples = 0
             for key in f.keys():
                 # visc0 = (2.0/float(key))
-                ux = torch.Tensor(f[key + '/ux'])
-                uy = torch.Tensor(f[key + '/uy'])
-                p = torch.Tensor(f[key + '/p'])
-                data_series = torch.stack([ux, uy, p], dim=1)
+                # ux = torch.Tensor(f[key + '/ux'])
+                # uy = torch.Tensor(f[key + '/uy'])
+                # p = torch.Tensor(f[key + '/p'])
+                # data_series = torch.stack([ux, uy, p], dim=1)
+                data_series = torch.Tensor(f[key])
                 # Stride over time-series data_series.size(0)
                 for i in range(0, data_series.size(0) - block_size + 1, block_size):  # Truncate in block of block_size
                     examples.append(data_series[i: i + block_size])

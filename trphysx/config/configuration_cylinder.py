@@ -24,7 +24,8 @@ class CylinderConfig(PhysConfig):
         n_embd=128,
         n_layer=6,
         n_head=4,
-        state_dims=[3,64,128],
+        # state_dims=[3,64,128],
+        state_dims=[15],
         activation_function="gelu_new",
         **kwargs
     ):
