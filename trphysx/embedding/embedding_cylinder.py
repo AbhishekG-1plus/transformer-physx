@@ -109,7 +109,7 @@ class CylinderEmbedding(EmbeddingModel):
         logger.info('Number of embedding parameters: {}'.format( super().num_parameters ))
 
     # def forward(self, x: Tensor, visc: Tensor) -> TensorTuple:
-     def forward(self, x: Tensor) -> TensorTuple:
+    def forward(self, x: Tensor) -> TensorTuple:
         """Forward pass
 
         Args:
