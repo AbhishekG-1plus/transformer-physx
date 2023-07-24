@@ -291,8 +291,19 @@ class CylinderDataHandler(EmbeddingDataHandler):
                     break
 
         data = torch.stack(examples, dim=0)
-        self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2]), torch.mean(torch.tensor(visc))])
-        self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2]), torch.std(torch.tensor(visc))])
+        # self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2]), torch.mean(torch.tensor(visc))])
+        # self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2]), torch.std(torch.tensor(visc))])
+        self.mu = torch.tensor([torch.mean(data[:,:,0]), torch.mean(data[:,:,1]), torch.mean(data[:,:,2]), 
+                                torch.mean(data[:,:,3]), torch.mean(data[:,:,4]), torch.mean(data[:,:,5]),
+                                torch.mean(data[:,:,6]), torch.mean(data[:,:,7]), torch.mean(data[:,:,8]),
+                                torch.mean(data[:,:,9]), torch.mean(data[:,:,10]), torch.mean(data[:,:,11]),
+                                torch.mean(data[:,:,12]),torch.mean(data[:,:,13]), torch.mean(data[:,:,14])])
+        
+        self.std = torch.tensor([torch.std(data[:,:,0]), torch.std(data[:,:,1]), torch.std(data[:,:,2]), 
+                                 torch.std(data[:,:,3]), torch.std(data[:,:,4]), torch.std(data[:,:,5]),
+                                 torch.std(data[:,:,6]), torch.std(data[:,:,7]), torch.std(data[:,:,8]),
+                                 torch.std(data[:,:,9]), torch.std(data[:,:,10]), torch.std(data[:,:,11]),
+                                 torch.std(data[:,:,12]),torch.std(data[:,:,13]), torch.std(data[:,:,14])])
         # Needs to min-max normalization due to the reservoir matrix, needing to have a spectral density below 1
         if (data.size(0) < batch_size):
             logging.warn('Lower batch-size to {:d}'.format(data.size(0)))
