@@ -216,13 +216,15 @@ class CylinderDataHandler(EmbeddingDataHandler):
         Args:
             examples (List): list of training/testing example flow fields
             visc (List): list of training/testing example viscosities
+            # def __init__(self, examples: List, visc: List) -> None:
+            # self.visc = visc
         """
-        # def __init__(self, examples: List, visc: List) -> None:
+        
         def __init__(self, examples: List) -> None:
             """Constructor
             """
             self.examples = examples
-            # self.visc = visc
+            
 
         def __len__(self):
             return len(self.examples)
@@ -316,8 +318,8 @@ class CylinderDataHandler(EmbeddingDataHandler):
             logging.warn('Lower batch-size to {:d}'.format(data.size(0)))
             batch_size = data.size(0)
 
-        # dataset = self.CylinderDataset(data, torch.stack(vis, dim=0))
-        dataset = self.CylinderDataset(data, torch.tensor([0]))
+        # dataset = self.CylinderDataset(data, torch.stack(visc, dim=0))
+        dataset = self.CylinderDataset(data)
         data_collator = self.CylinderDataCollator()
         training_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=data_collator, drop_last=True)
         return training_loader
