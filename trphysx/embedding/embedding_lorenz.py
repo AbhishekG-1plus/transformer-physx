@@ -234,6 +234,8 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
             mseLoss_2.append(mseLoss(xRec1, xin0).detach())
             mseLoss_3.append(torch.sum(torch.pow(self.embedding_model.koopmanOperator, 2)).detach())
 
+            print(mseLoss_1, mseLoss_2, mseLoss_3)
+
             loss_reconstruct = loss_reconstruct + mseLoss(xRec1, xin0).detach()
             g1_old = g1Pred
 
