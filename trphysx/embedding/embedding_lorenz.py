@@ -35,55 +35,21 @@ class LorenzEmbedding(EmbeddingModel):
         """
         super().__init__(config)
 
-        # hidden_states = int(abs(config.state_dims[0] - config.n_embd)/2) + 1
+        hidden_states = int(abs(config.state_dims[0] - config.n_embd)/2) + 1
         hidden_states = 500
 
         self.observableNet = nn.Sequential(
-            # nn.Linear(config.state_dims[0], hidden_states),
-            # nn.ReLU(),
-            # nn.Linear(hidden_states, config.n_embd),
-            nn.Conv2d(config.state_dims[0], 16, kernel_size=(3, 3), stride=2),
-            # nn.BatchNorm2d(16),
-            nn.ReLU(True),
-            # 8, 32, 64
-            nn.Conv2d(16, 32, kernel_size=(3, 3), stride=2),
-            # nn.BatchNorm2d(32),
-            nn.ReLU(True),
-            # 16, 16, 32
-            nn.Conv2d(32, 64, kernel_size=(3, 3), stride=2),
-            # nn.BatchNorm2d(64),
-            nn.ReLU(True),
-            # 16, 8, 16
-            nn.Conv2d(64, 128, kernel_size=(3, 3), stride=2),
-            # nn.BatchNorm2d(128),
-            nn.ReLU(True),
-            # 16, 4, 8
-            nn.Conv2d(128, config.n_embd, kernel_size=(3, 3), stride=1),
+            nn.Linear(config.state_dims[0], hidden_states),
+            nn.ReLU(),
+            nn.Linear(hidden_states, config.n_embd),
             nn.LayerNorm(config.n_embd, eps=config.layer_norm_epsilon),
             nn.Dropout(config.embd_pdrop)
         )
 
         self.recoveryNet = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(config.n_embd, 128, kernel_size=(3, 3), stride=1),
+            nn.Linear(config.n_embd, hidden_states),
             nn.ReLU(),
-            # 16, 8, 16
-            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(128, 64, kernel_size=(3, 3), stride=1),
-            nn.ReLU(),
-            # 16, 16, 32
-            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=(3, 3), stride=1),
-            nn.ReLU(),
-            # 8, 32, 64
-            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(32, 16, kernel_size=(3, 3), stride=1),
-            nn.ReLU(),
-            # 16, 64, 128
-            nn.Conv2d(16, config.state_dims[0], kernel_size=(3, 3), stride=1),
-            # nn.Linear(config.n_embd, hidden_states),
-            # nn.ReLU(),
-            # nn.Linear(hidden_states, config.state_dims[0])
+            nn.Linear(hidden_states, config.state_dims[0])
         )
         # Learned Koopman operator
         self.obsdim = config.n_embd
@@ -92,7 +58,7 @@ class LorenzEmbedding(EmbeddingModel):
         # Off-diagonal indices
         xidx = []
         yidx = []
-        for i in range(1, 15): 
+        for i in range(1, 15):
             yidx.append(np.arange(i, config.n_embd))
             xidx.append(np.arange(0, config.n_embd-i))
 
@@ -109,13 +75,13 @@ class LorenzEmbedding(EmbeddingModel):
         """Forward pass
 
         Args:
-            x (Tensor): [B, 15] Input feature tensor
+            x (Tensor): [B, 3] Input feature tensor
 
         Returns:
             TensorTuple: Tuple containing:
 
                 | (Tensor): [B, config.n_embd] Koopman observables
-                | (Tensor): [B, 15] Recovered feature tensor
+                | (Tensor): [B, 3] Recovered feature tensor
         """
         # Encode
         x = self._normalize(x)
@@ -129,7 +95,7 @@ class LorenzEmbedding(EmbeddingModel):
         """Embeds tensor of state variables to Koopman observables
 
         Args:
-            x (Tensor): [B, 15] Input feature tensor
+            x (Tensor): [B, 3] Input feature tensor
 
         Returns:
             Tensor: [B, config.n_embd] Koopman observables
@@ -145,7 +111,7 @@ class LorenzEmbedding(EmbeddingModel):
             g (Tensor): [B, config.n_embd] Koopman observables
 
         Returns:
-            Tensor: [B, 15] Physical feature tensor
+            Tensor: [B, 3] Physical feature tensor
         """
         out = self.recoveryNet(g)
         x = self._unnormalize(out)
@@ -191,9 +157,6 @@ class LorenzEmbedding(EmbeddingModel):
             return self.kMatrix
 
     def _normalize(self, x):
-        # print(x.shape)
-        # print(self.mu.shape)
-        print(self.std.shape)
         return (x - self.mu.unsqueeze(0))/self.std.unsqueeze(0)
 
     def _unnormalize(self, x):
@@ -219,7 +182,7 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         """Trains model for a single epoch
 
         Args:
-            states (Tensor): [B, T, 15] Time-series feature tensor
+            states (Tensor): [B, T, 3] Time-series feature tensor
 
         Returns:
             FloatTuple: Tuple containing:
@@ -262,7 +225,7 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         predictions.
 
         Args:
-            states (Tensor): [B, T, 15] Time-series feature tensor
+            states (Tensor): [B, T, 3] Time-series feature tensor
 
         Returns:
             Tuple[Float, Tensor, Tensor]: Test error, Predicted states, Target states
@@ -287,7 +250,3 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         test_loss = mseLoss(yTarget, yPred)
 
         return test_loss, yPred, yTarget
-    
-    def testPrint(self):
-        print("Hello World")
-        return 0
