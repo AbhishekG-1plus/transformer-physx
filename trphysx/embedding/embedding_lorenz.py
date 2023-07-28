@@ -42,45 +42,45 @@ class LorenzEmbedding(EmbeddingModel):
             # nn.Linear(config.state_dims[0], hidden_states),
             # nn.ReLU(),
             # nn.Linear(hidden_states, config.n_embd),
-            nn.Conv2d(config.state_dims[0], 16, kernel_size=(3, 3), stride=2),
+            nn.Conv2d(config.state_dims[0], 16, kernel_size=(3, 3), stride=2, padding=1, padding_mode='replicate'),
             # nn.BatchNorm2d(16),
             nn.ReLU(True),
             # 8, 32, 64
-            nn.Conv2d(16, 32, kernel_size=(3, 3), stride=2),
+            nn.Conv2d(16, 32, kernel_size=(3, 3), stride=2, padding=1, padding_mode='replicate'),
             # nn.BatchNorm2d(32),
             nn.ReLU(True),
             # 16, 16, 32
-            nn.Conv2d(32, 64, kernel_size=(3, 3), stride=2),
+            nn.Conv2d(32, 64, kernel_size=(3, 3), stride=2, padding=1, padding_mode='replicate'),
             # nn.BatchNorm2d(64),
             nn.ReLU(True),
             # 16, 8, 16
-            nn.Conv2d(64, 128, kernel_size=(3, 3), stride=2),
+            nn.Conv2d(64, 128, kernel_size=(3, 3), stride=2, padding=1, padding_mode='replicate'),
             # nn.BatchNorm2d(128),
             nn.ReLU(True),
             # 16, 4, 8
-            nn.Conv2d(128, config.n_embd, kernel_size=(3, 3), stride=1),
+            nn.Conv2d(128, config.n_embd, kernel_size=(3, 3), stride=1, padding=1, padding_mode='replicate'),
             nn.LayerNorm(config.n_embd, eps=config.layer_norm_epsilon),
             nn.Dropout(config.embd_pdrop)
         )
 
         self.recoveryNet = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(config.n_embd, 128, kernel_size=(3, 3), stride=1),
+            nn.Conv2d(config.n_embd, 128, kernel_size=(3, 3), stride=1, padding=1, padding_mode='replicate'),
             nn.ReLU(),
             # 16, 8, 16
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(128, 64, kernel_size=(3, 3), stride=1),
+            nn.Conv2d(128, 64, kernel_size=(3, 3), stride=1, padding=1, padding_mode='replicate'),
             nn.ReLU(),
             # 16, 16, 32
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=(3, 3), stride=1),
+            nn.Conv2d(64, 32, kernel_size=(3, 3), stride=1, padding=1, padding_mode='replicate'),
             nn.ReLU(),
             # 8, 32, 64
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(32, 16, kernel_size=(3, 3), stride=1),
+            nn.Conv2d(32, 16, kernel_size=(3, 3), stride=1, padding=1, padding_mode='replicate'),
             nn.ReLU(),
             # 16, 64, 128
-            nn.Conv2d(16, config.state_dims[0], kernel_size=(3, 3), stride=1),
+            nn.Conv2d(16, config.state_dims[0], kernel_size=(3, 3), stride=1, padding=1, padding_mode='replicate'),
             # nn.Linear(config.n_embd, hidden_states),
             # nn.ReLU(),
             # nn.Linear(hidden_states, config.state_dims[0])
