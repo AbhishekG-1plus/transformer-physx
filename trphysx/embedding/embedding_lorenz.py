@@ -39,17 +39,28 @@ class LorenzEmbedding(EmbeddingModel):
         hidden_states = 500
 
         self.observableNet = nn.Sequential(
-            nn.Linear(config.state_dims[0], hidden_states),
+            # nn.Linear(config.state_dims[0], hidden_states),
+            # nn.ReLU(),
+            # nn.Linear(hidden_states, config.n_embd),
+            # nn.LayerNorm(config.n_embd, eps=config.layer_norm_epsilon),
+            # nn.Dropout(config.embd_pdrop)
+
+            nn.Conv1d(config.state_dims[0], hidden_states,16),
             nn.ReLU(),
-            nn.Linear(hidden_states, config.n_embd),
+            nn.Conv1d(hidden_states, config.n_embd, 16),
             nn.LayerNorm(config.n_embd, eps=config.layer_norm_epsilon),
             nn.Dropout(config.embd_pdrop)
+
         )
 
         self.recoveryNet = nn.Sequential(
-            nn.Linear(config.n_embd, hidden_states),
+            # nn.Linear(config.n_embd, hidden_states),
+            # nn.ReLU(),
+            # nn.Linear(hidden_states, config.state_dims[0])
+
+            nn.Conv1d(config.n_embd, hidden_states, 16),
             nn.ReLU(),
-            nn.Linear(hidden_states, config.state_dims[0])
+            nn.Conv1d(hidden_states, config.state_dims[0], 16)        
         )
         # Learned Koopman operator
         self.obsdim = config.n_embd
@@ -203,6 +214,10 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         loss = (1e4)*mseLoss(xin0, xRec0)
         loss_reconstruct = loss_reconstruct + mseLoss(xin0, xRec0).detach()
 
+        mseLoss_1 =[]
+        mseLoss_2 =[]
+        mseLoss_3 =[]
+
         g1_old = g0
         # Loop through time-series
         for t0 in range(1, states.shape[1]):
@@ -214,11 +229,15 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
 
             loss = loss + mseLoss(xgRec1, xin0) + (1e4)*mseLoss(xRec1, xin0) \
                 + (1e-1)*torch.sum(torch.pow(self.embedding_model.koopmanOperator, 2))
+            
+            mseLoss_1.append(mseLoss(xgRec1, xin0).detach())
+            mseLoss_2.append(mseLoss(xRec1, xin0).detach())
+            mseLoss_3.append(torch.sum(torch.pow(self.embedding_model.koopmanOperator, 2)).detach())
 
             loss_reconstruct = loss_reconstruct + mseLoss(xRec1, xin0).detach()
             g1_old = g1Pred
 
-        return loss, loss_reconstruct
+        return loss, loss_reconstruct, mseLoss_1, mseLoss_2, mseLoss_3
 
     def evaluate(self, states: Tensor) -> Tuple[float, Tensor, Tensor]:
         """Evaluates the embedding models reconstruction error and returns its
