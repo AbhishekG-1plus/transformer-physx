@@ -207,6 +207,9 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         loss_reconstruct = loss_reconstruct + mseLoss(xin0, xRec0).detach()
 
         g1_old = g0
+        loss_1 =[]
+        loss_2 =[]
+        loss_3 =[]
         # Loop through time-series
         for t0 in range(1, states.shape[1]):
             xin0 = states[:,t0,:].to(device) # Next time-step
@@ -217,6 +220,10 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
 
             loss = loss + mseLoss(xgRec1, xin0) + (1e4)*mseLoss(xRec1, xin0) \
                 + (1e-1)*torch.sum(torch.pow(self.embedding_model.koopmanOperator, 2))
+            
+            loss_1.append(mseLoss(xgRec1, xin0).detach())
+            loss_2.append(mseLoss(xRec1, xin0).detach())
+            loss_3.append(torch.sum(torch.pow(self.embedding_model.koopmanOperator, 2)).detach())
 
             loss_reconstruct = loss_reconstruct + mseLoss(xRec1, xin0).detach()
             g1_old = g1Pred
