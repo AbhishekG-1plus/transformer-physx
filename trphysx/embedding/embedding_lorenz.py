@@ -271,7 +271,7 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
         plt.plot(epochs, loss_1, label='Loss 1')
         plt.plot(epochs, loss_2, label='Loss 2')
         plt.plot(epochs, loss_3, label='Loss 3')
-        plt.xlabel('Epochs')
+        plt.xlabel('Time')
         plt.ylabel('Loss')
         plt.title('Losses During Training')
         plt.legend()
