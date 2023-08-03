@@ -15,7 +15,7 @@ from typing import List, Tuple
 from .embedding_model import EmbeddingModel, EmbeddingTrainingHead
 from trphysx.config.configuration_phys import PhysConfig
 from torch.autograd import Variable
-
+import matplotlib.pyplot as plt
 logger = logging.getLogger(__name__)
 # Custom types
 Tensor = torch.Tensor
@@ -159,7 +159,7 @@ class LorenzEmbedding(EmbeddingModel):
     def _normalize(self, x):
         # print(x.shape)
         # print(self.mu.shape)
-        print(self.std.shape)
+        # print(self.std.shape)
         return (x - self.mu.unsqueeze(0))/self.std.unsqueeze(0)
 
     def _unnormalize(self, x):
@@ -171,10 +171,11 @@ class LorenzEmbedding(EmbeddingModel):
 
 class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
     """Training head for the Lorenz embedding model
-
+    
     Args:
         config (PhysConfig): Configuration class with transformer/embedding parameters
     """
+    serial_number = 1
     def __init__(self, config: PhysConfig):
         """Constructor method
         """
@@ -227,7 +228,10 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
 
             loss_reconstruct = loss_reconstruct + mseLoss(xRec1, xin0).detach()
             g1_old = g1Pred
-
+        loss_1_cpu = [ l.detach().cpu().numpy() for l in loss_1]
+        loss_2_cpu = [ l.detach().cpu().numpy() for l in loss_2]
+        loss_3_cpu = [ l.detach().cpu().numpy() for l in loss_3]
+        self.PlotPrint(loss_1_cpu,loss_2_cpu,loss_3_cpu)
         return loss, loss_reconstruct
 
     def evaluate(self, states: Tensor) -> Tuple[float, Tensor, Tensor]:
@@ -261,6 +265,21 @@ class LorenzEmbeddingTrainer(EmbeddingTrainingHead):
 
         return test_loss, yPred, yTarget
     
-    def testPrint(self):
-        print("Hello World")
+    def PlotPrint(self,loss_1: List[float], loss_2: List[float], loss_3: List[float]):
+        epochs = range(1, 254 + 1)
+        plt.figure(figsize=(10, 6))
+        plt.plot(epochs, loss_1, label='Loss 1')
+        plt.plot(epochs, loss_2, label='Loss 2')
+        plt.plot(epochs, loss_3, label='Loss 3')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title('Losses During Training')
+        plt.legend()
+        plt.show()
+        
+
+        # Specify the full path to the desired directory where you want to save the image
+        save_path = f'/content/transformer-physx/outputs/embedding_lorenz/ntrain255_epochs300_batch255/predictions/loss_plot_{LorenzEmbeddingTrainer.serial_number:03d}.png'
+        plt.savefig(save_path)
+        LorenzEmbeddingTrainer.serial_number += 1
         return 0
